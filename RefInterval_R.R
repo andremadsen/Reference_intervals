@@ -11,7 +11,7 @@ Data <- read.csv(file.choose(), header=T, sep=";", dec=",")
 plot.default(Data$Age, Data$Testosterone)
 y <- data.frame(Data$Age, Data$Testosterone)
 colnames(y) <- c("Age","Hormone")
-y <- y[complete.cases(y$Hormone), ]
+y <- na.omit(y)
 y <- y[order(y$Age, decreasing = FALSE),]  
 y$Age
 y$Hormone
@@ -169,9 +169,9 @@ Data7 <- Data6[1:362,]
 Data8 <- cbind(y[120:481,], Data7)
 
 
-#PLOT THE WHOLE THING
+#PLOT THE CONTINUOUS REFERENCE INTERVALS CHART
 ggplot(y, aes(x=Age, y=Hormone)) + geom_point() + theme_bw() + 
-  labs(title="ReferenceIntervals test", x="Age, y (girls)", y="Serum SHBG (nmol/L)") +
+  labs(title="ReferenceIntervals test", x="Age, y (boys)", y="Serum Total Testosterone (nmol/L)") +
   geom_line(data=Data8, aes(x=Age,y=LowerLim), inherit.aes = FALSE, linetype = "solid", lwd=1.2) +
   geom_line(data=Data8, aes(x=Age,y=UpperLim), inherit.aes = FALSE, linetype = "solid", lwd=1.2) +
   geom_ribbon(data=Data8, aes(x=Age,ymin=CI_LL_L,ymax=CI_LL_U), inherit.aes = FALSE, fill = 'grey63', alpha = 0.5) +
@@ -179,26 +179,15 @@ ggplot(y, aes(x=Age, y=Hormone)) + geom_point() + theme_bw() +
   geom_line(data=Data8, aes(x=Age,y=Median), inherit.aes = FALSE, linetype = "solid", color = 'red', lwd=1.2)
 
 
-  
-ggsave("ReferenceIntervalTest.pdf", dpi = 600)
-
-
-#ReferenceIntervals example non-parametric
-ref <- refLimit(Data2$Hormone, out.method = "horn", out.rm = FALSE, RI = "n", CI = "n",
-                  refConf = NULL, limitConf = 0.9, bootStat = "basic")
-ref
-
-
-
-ReadOut <- data.frame(testVec_upper, testVec_lower, Confidence)
-write.csv(testVec_upper, file = "quantiles.csv")
-plot(y$Age[121:481],testVec_upper, type = "l")
-+ plot(y$Age[121:481],testVec_lower, type = "l")
+ggsave("ReferenceIntervalTest.tiff", dpi = 600)
 
 
 
 
-#ZOO PACKAGE equivalent function
+
+#######################
+# ZOO PACKAGE equivalent function
+#######################
 t <- rollapply(y$Hormone, width = 120, by = 1, FUN = function(x) refLimit(x, out.method = "horn", 
                                                                                out.rm = F, RI = "n", 
                                                                                CI = "n", refConf = 0.95, 
