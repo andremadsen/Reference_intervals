@@ -1,7 +1,8 @@
 install.packages("referenceIntervals", dependencies=TRUE)
 library(referenceIntervals)
-install.packages("zoo", dependencies=TRUE)
+install.packages("zoo")
 library(zoo)
+library(ggplot2)
 
 
 
